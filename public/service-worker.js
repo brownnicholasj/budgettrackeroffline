@@ -1,5 +1,6 @@
 const version = '0.0.01';
 const CACHE_NAME = `budget-tracker-cache-${version}`;
+const DATA_CACHE_NAME = `indexDB Stuff`;
 const FILES_TO_CACHE = [
 	'/',
 	'/index.html',
@@ -37,7 +38,7 @@ self.addEventListener('fetch', function (evt) {
 	if (evt.request.url.includes('/api/')) {
 		evt.respondWith(
 			caches
-				.open(DATA_CACHE_NAME)
+				.open(DATA_CACHE_NAME) //input indexDB here
 				.then((cache) => {
 					return fetch(evt.request)
 						.then((response) => {
