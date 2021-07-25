@@ -1,6 +1,6 @@
 const version = '0.0.01';
 const CACHE_NAME = `budget-tracker-cache-${version}`;
-const DATA_CACHE_NAME = `indexDB Stuff`;
+const DATA_CACHE_NAME = `BudgetLedger`;
 const FILES_TO_CACHE = [
 	'/',
 	'/index.html',
@@ -23,10 +23,17 @@ self.addEventListener('install', function (evt) {
 });
 
 // activate
-self.addEventListener('activate', function (evt) {
+self.addEventListener('activate', (evt) => {
 	evt.waitUntil(
 		caches.keys().then((keyList) => {
-			return console.log('Do Something Here', keyList);
+			return Promise.all(
+				keyList.map((key) => {
+					if (key !== CACHE_NAME && key !== DATA_CACHE_NAME) {
+						console.log('Removing old cache data', key);
+						return caches.delete(key);
+					}
+				})
+			);
 		})
 	);
 
@@ -44,9 +51,8 @@ self.addEventListener('fetch', function (evt) {
 						.then((response) => {
 							// If the response was good, clone it and store it in the cache.
 							if (response.status === 200) {
-								cache.put(evt.request.url, response.clone());
+								cache.add(evt.request.url, response.clone());
 							}
-
 							return response;
 						})
 						.catch((err) => {
@@ -54,7 +60,9 @@ self.addEventListener('fetch', function (evt) {
 							return cache.match(evt.request);
 						});
 				})
-				.catch((err) => console.log(err))
+				.catch((err) => {
+					console.log(err);
+				})
 		);
 
 		return;
