@@ -1,10 +1,11 @@
 const version = '0.0.01';
 const CACHE_NAME = `budget-tracker-cache-${version}`;
-const DATA_CACHE_NAME = `BudgetLedger`;
+const DATA_CACHE_NAME = `offlineBudget`;
 const FILES_TO_CACHE = [
 	'/',
 	'/index.html',
 	'/index.js',
+	'/db.js',
 	'/styles.css',
 	'/icons/icon-144x144.png',
 	'/icons/icon-192x192.png',
@@ -45,7 +46,7 @@ self.addEventListener('fetch', function (evt) {
 	if (evt.request.url.includes('/api/')) {
 		evt.respondWith(
 			caches
-				.open(DATA_CACHE_NAME) //input indexDB here
+				.open(DATA_CACHE_NAME)
 				.then((cache) => {
 					return fetch(evt.request)
 						.then((response) => {

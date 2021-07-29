@@ -1,69 +1,58 @@
 let db;
-let budgetVersion;
+let versionControl = 2;
 
-const request = indexedDB.open('OfflineBudget', budgetVersion || 21);
+const request = window.indexedDB.open('offlineBudget', versionControl || 21);
 
-request.onupgradeneeded = function (e) {
-	console.log('Upgrade needed in IndexDB');
-	const db = e.target.result;
-	const budgetOffline = db.createObjectStore('budget', { autoIncrement: true });
-	budgetOffline.createIndex('offlineIndex', 'pending');
+request.onupgradeneeded = (event) => {
+	db = event.target.result;
+	const budgetPending = db.createObjectStore('offlineBudget', {
+		autoIncrement: true,
+	});
+	budgetPending.createIndex('pendingStatus', 'pending');
 };
 
-request.onerror = function (e) {
-	console.log(`An error of ${e.target.errorCode} with the budgetOfflineDB`);
-};
-
-request.onsuccess = function (e) {
-	db = e.target.result;
-
+request.onsuccess = (event) => {
+	db = event.target.result;
 	if (navigator.onLine) {
 		checkDatabase();
 	}
 };
 
-function checkDatabase() {
-	let transaction = db.transaction(['budget'], 'readwrite');
+request.onerror = (error) => {
+	console.log('ERROR:', error);
+};
 
-	const offlineBudget = transaction.objectStore('budget');
+function saveRecord(record) {
+	const transaction = db.transaction(['offlineBudget'], 'readwrite');
+	const budgetPending = transaction.objectStore('offlineBudget');
 
-	const getAll = offlineBudget.getAll();
+	budgetPending.add(record);
+}
 
-	getAll.onsuccess = function () {
-		if (getAll.result.length > 0) {
+checkDatabase = () => {
+	const transaction = db.transaction(['offlineBudget'], 'readwrite');
+	const budgetPending = transaction.objectStore('offlineBudget');
+	const getRequest = budgetPending.getAll();
+
+	getRequest.onsuccess = () => {
+		if (getRequest.result.length > 0) {
 			fetch('/api/transaction/bulk', {
 				method: 'POST',
-				body: JSON.stringify(getAll.result),
+				body: JSON.stringify(getRequest.result),
 				headers: {
 					'Accept': 'application/json, text/plain, */*',
 					'Content-Type': 'application/json',
 				},
 			})
 				.then((response) => response.json())
-				.then((res) => {
-					if (res.length !== 0) {
-						transaction = db.transaction(['budget'], 'readwrite');
+				.then(() => {
+					const transaction = db.transaction(['offlineBudget'], 'readwrite');
+					const budgetPending = transaction.objectStore('offlineBudget');
 
-						const currentStore = transaction.objectStore('budget');
-
-						currentStore.clear();
-					}
+					budgetPending.clear();
 				});
 		}
 	};
-}
-
-const saveRecord = (record) => {
-	console.log('saving record');
-	const transaction = db.transaction(['budget'], 'readwrite');
-
-	const offlineBudget = transaction.objectStore('budget');
-
-	offlineBudget.add(record);
 };
 
-// Listen for app coming back online
-window.addEventListener('online', (event) => {
-	console.log('you are online');
-	checkDatabase();
-});
+window.addEventListener('online', checkDatabase);
