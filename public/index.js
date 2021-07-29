@@ -1,5 +1,5 @@
-let transactions = [];
-let myChart;
+const transactions = [];
+const myChart;
 
 fetch('/api/transaction')
 	.then((response) => {
@@ -14,21 +14,21 @@ fetch('/api/transaction')
 	});
 
 function populateTotal() {
-	let total = transactions.reduce((total, t) => {
+	const total = transactions.reduce((total, t) => {
 		return total + parseInt(t.value);
 	}, 0);
 
-	let totalEl = document.querySelector('#total');
+	const totalEl = document.querySelector('#total');
 	totalEl.textContent = total;
 }
 
 function populateTable() {
-	let tbody = document.querySelector('#tbody');
+	const tbody = document.querySelector('#tbody');
 	tbody.innerHTML = '';
 
 	transactions.forEach((transaction) => {
 		// create and populate a table row
-		let tr = document.createElement('tr');
+		const tr = document.createElement('tr');
 		tr.innerHTML = `
       <td>${transaction.name}</td>
       <td>${transaction.value}</td>
@@ -39,15 +39,15 @@ function populateTable() {
 }
 
 function populateChart() {
-	let reversed = transactions.slice().reverse();
-	let sum = 0;
+	const reversed = transactions.slice().reverse();
+	const sum = 0;
 
-	let labels = reversed.map((t) => {
-		let date = new Date(t.date);
+	const labels = reversed.map((t) => {
+		const date = new Date(t.date);
 		return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
 	});
 
-	let data = reversed.map((t) => {
+	const data = reversed.map((t) => {
 		sum += parseInt(t.value);
 		return sum;
 	});
@@ -56,7 +56,7 @@ function populateChart() {
 		myChart.destroy();
 	}
 
-	let ctx = document.getElementById('myChart').getContext('2d');
+	const ctx = document.getElementById('myChart').getContext('2d');
 
 	myChart = new Chart(ctx, {
 		type: 'line',
@@ -75,9 +75,9 @@ function populateChart() {
 }
 
 function sendTransaction(isAdding) {
-	let nameEl = document.querySelector('#t-name');
-	let amountEl = document.querySelector('#t-amount');
-	let errorEl = document.querySelector('.form .error');
+	const nameEl = document.querySelector('#t-name');
+	const amountEl = document.querySelector('#t-amount');
+	const errorEl = document.querySelector('.form .error');
 
 	if (nameEl.value === '' || amountEl.value === '') {
 		errorEl.textContent = 'Missing Information';
@@ -86,7 +86,7 @@ function sendTransaction(isAdding) {
 		errorEl.textContent = '';
 	}
 
-	let transaction = {
+	const transaction = {
 		name: nameEl.value,
 		value: amountEl.value,
 		date: new Date().toISOString(),
