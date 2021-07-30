@@ -21,7 +21,6 @@ Link to App: https://brownnicholasj-budget-tracker.herokuapp.com/
 - [Usage](#usage)
 - [License](#license)
 - [Contributing](#contributing)
-- [Behind The Code](#behind-the-code)
 - [Questions](#questions)
 
 ## Installation
@@ -54,6 +53,18 @@ with the current balance ![usage001](./public/assets/images/usage001.jpg)
 If the user does NOT have online access, the Page will load with a
 manifest.webmanifest ![usage002](./public/assets/images/usage002.jpg)
 
+The data to populate the app will be called from the cache
+![usage003](./public/assets/images/usage003.jpg)
+
+When entering data in an 'offline' status, data will be stored in the indexedDB
+![usage004](./public/assets/images/usage004.jpg)
+
+Upon coming back online, the service worker will take the data from indexedDB
+and add to the MongoDB, which will also add to the cache.
+
+The indexedDB will then be emptied to free up space and ready the indexedDB for
+next possible offline entry.
+
 ## License
 
 This project is licensed under the MIT license.
@@ -64,37 +75,6 @@ A thanks to the following contributors to this project:
 
 - 2021 Trilogy Education Services, LLC
 - Nicholas Brown (brownnicholasj.dev@gmail.com)
-
-### Behind the Code
-
-As the front end of the code was 'provided' by Trilogy Education Services, this
-review will be focused on the back end code, specifically the routes and
-interaction with the MongoDB.
-
-- The routes were created using express.router and stored on two javascript
-  files (api.js and views.js) <br> ![btc001](./public/assets/images/btc001.jpg)
-
-- The 'views' routes are handling sending the HTML pages to display the correct
-  UI to the user as they traverse the application: <br>
-  ![btc002](./public/assets/images/btc002.jpg)
-
-- The 'api' routes are handling the data requests from the database with MongoBD
-
-  - Showing in four sections, the first is the constants that are created to
-    house the requirements for the api.js
-    ![btc003](./public/assets/images/btc003.jpg)
-  - The second section are the list of 'POST' actions to save data to the
-    database. This handles when a user 'creates' a new workout or saves a new
-    exercise to a workout. ![btc004](./public/assets/images/btc004.jpg)
-    - the '/workouts/range' was kept in to accept an integration file to import
-      more than one entry at a time
-  - The third section is the 'PUT' action, which will find a specific workout by
-    looking up the mongoDB ObjectID (utilizing Mongojs)
-    ![btc005](./public/assets/images/btc005.jpg)
-  - The last section is the 'GET' actions, which will display the data. This is
-    utilizing the aggregate property defined in section 1 in order to add fields
-    and summarize the duration of all of the exercises in a workout.
-    ![btc006](./public/assets/images/btc006.jpg)
 
 ## Questions
 
