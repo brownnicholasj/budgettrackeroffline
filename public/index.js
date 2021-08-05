@@ -1,5 +1,5 @@
 const transactions = [];
-const myChart;
+let myChart;
 
 fetch('/api/transaction')
 	.then((response) => {
