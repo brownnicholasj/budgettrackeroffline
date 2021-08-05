@@ -40,7 +40,7 @@ function populateTable() {
 
 function populateChart() {
 	const reversed = transactions.slice().reverse();
-	const sum = 0;
+	var sum = 0;
 
 	const labels = reversed.map((t) => {
 		const date = new Date(t.date);
